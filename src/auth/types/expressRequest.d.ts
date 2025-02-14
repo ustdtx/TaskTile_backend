@@ -1,9 +1,5 @@
-import { Request } from "express";
+import { Request } from 'express';
 
 export interface AuthenticatedRequest extends Request {
-  user?: {
-    id: string;
-    //username: string;
-    //email: string;
-  };
+    user?: any; // Adjust the type based on your user model
 }
