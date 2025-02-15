@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpException, HttpStatus, Get, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Body, HttpException, HttpStatus, Get, UseGuards, Req, NotFoundException, Param } from '@nestjs/common';
 import { AuthService } from '../auth/auth.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { JwtStrategy } from '../auth/jwt.strategy';
@@ -36,6 +36,13 @@ export class AuthController {
       return await this.authService.details(body.id);
     } catch (none){}
   }
+  @Get('user/:id')
+  async getUserWithTasks(@Param('id') id: string) {
+    const user = await this.authService.getUserWithTasks(id);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
 }
 
-
+}

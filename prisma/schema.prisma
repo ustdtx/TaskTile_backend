@@ -14,6 +14,13 @@ model User {
   password  String
   role      String   @default("user")
   createdAt DateTime @default(now())
+  tasks Task[]
+}
+
+enum TaskStatus {
+  ONGOING
+  PAUSED
+  COMPLETED
 }
 
 model Task {
@@ -21,5 +28,8 @@ model Task {
   name        String
   description String?
   deadline    DateTime?
-  createdAt   DateTime  @default(now())
+  status      TaskStatus @default(ONGOING)  // Default status is ONGOING
+  createdAt   DateTime @default(now())
+  userId      String?   // Foreign key to User
+  user        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

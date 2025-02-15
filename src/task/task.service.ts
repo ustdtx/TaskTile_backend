@@ -9,22 +9,47 @@ export class TaskService {
 
   async createTask(createTaskDto: CreateTaskDto) {
     const task = await this.prisma.task.create({
-      data: createTaskDto,
+      data: {
+        name: createTaskDto.name,
+        description: createTaskDto.description,
+        deadline: createTaskDto.deadline ? new Date(createTaskDto.deadline) : null,
+        status: createTaskDto.status || 'ONGOING',
+        userId: createTaskDto.userId || null, // Assign to a user if provided
+      },
     });
+  
     return { message: 'Task added successfully', taskId: task.id };
   }
 
   async editTask(id: string, updateTaskDto: UpdateTaskDto) {
     const existingTask = await this.prisma.task.findUnique({ where: { id } });
+  
     if (!existingTask) {
       throw new NotFoundException('Task not found');
     }
-
-    await this.prisma.task.update({
+  
+    const updatedTask = await this.prisma.task.update({
       where: { id },
-      data: updateTaskDto,
+      data: {
+        name: updateTaskDto.name ?? existingTask.name,
+        description: updateTaskDto.description ?? existingTask.description,
+        deadline: updateTaskDto.deadline ? new Date(updateTaskDto.deadline) : existingTask.deadline,
+        status: updateTaskDto.status ?? existingTask.status,
+      },
     });
-
-    return { message: 'Task updated successfully' };
+  
+    return { message: 'Task updated successfully', task: updatedTask };
   }
+  async deleteTask(id: string) {
+    const existingTask = await this.prisma.task.findUnique({ where: { id } });
+  
+    if (!existingTask) {
+      throw new NotFoundException('Task not found');
+    }
+  
+    await this.prisma.task.delete({ where: { id } });
+  
+    return { message: 'Task deleted successfully' };
+  }
+  
 }
