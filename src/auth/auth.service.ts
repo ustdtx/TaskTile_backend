@@ -31,7 +31,10 @@ export class AuthService {
 
   async details(id: string) {
     const user =await this.prisma.user.findUnique({where: {id}});
-    return { message: "User Details", role: user?.role, email: user?.email, username: user?.username, id: user?.id};
+    if (!user){
+      throw new NotFoundException('User not found');
+    }
+    return { message: "User Details", role: user.role, email: user.email, username: user.username, id: user.id};
   }
 
   async getUserWithTasks(userId: string) {
