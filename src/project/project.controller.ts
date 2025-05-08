@@ -3,6 +3,7 @@ import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { AddMemberDto } from './dto/add-member.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
+import { PrismaService } from '../prisma.service';  
 
 
 @Controller('projects')
@@ -28,4 +29,13 @@ export class ProjectController {
   getMembers(@Param('id') id: string) {
     return this.service.getMembers(id);
   }
+// projects.controller.ts
+
+@Get('user/:userId')
+async getProjectsByUser(@Param('userId') userId: string) {
+  return this.service.getProjectsForUser(userId);
 }
+
+}
+
+

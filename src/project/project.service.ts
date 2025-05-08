@@ -55,4 +55,13 @@ export class ProjectService {
       include: { user: true },
     });
   }
+async getProjectsForUser(userId: string) {
+  return this.prisma.projectMember.findMany({
+    where: { userId },
+    include: {
+      project: true,
+    },
+  });
+}
+
 }
