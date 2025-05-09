@@ -64,7 +64,9 @@ model ProjectTask {
   title       String
   description String?
   deadline    DateTime?
-  completed   Boolean    @default(false)
+  status      TaskStatus    @default(ONGOING)
+
+  creatorId   String?     
 
   projectId   String
   assigneeId  String?

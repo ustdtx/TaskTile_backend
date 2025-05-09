@@ -12,6 +12,6 @@ import { PrismaModule } from './prisma.module';
 @Module({
   imports: [AuthModule, TaskModule, ProjectModule, ProjectTaskModule,PrismaModule],
   controllers: [AppController],
-  providers: [AppService, ProjectTaskService],
+  providers: [AppService],
 })
 export class AppModule {}     

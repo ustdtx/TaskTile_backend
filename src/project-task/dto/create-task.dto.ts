@@ -1,4 +1,5 @@
 import { IsDate, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateTaskDto {
   @IsString()
@@ -9,6 +10,7 @@ export class CreateTaskDto {
   description?: string;
 
   @IsOptional()
+  @Type(() => Date)
   @IsDate()
   deadline?: Date;
 

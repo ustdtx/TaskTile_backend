@@ -2,6 +2,7 @@ import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/commo
 import { PrismaService } from '../prisma.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { title } from 'process';
 
 @Injectable()
 export class ProjectTaskService {
@@ -13,7 +14,14 @@ export class ProjectTaskService {
     });
     if (!member?.isManager) throw new ForbiddenException('Only managers can create tasks');
 
-    return this.prisma.projectTask.create({ data: dto });
+    return this.prisma.projectTask.create({ data: {
+      title: dto.title,
+      description: dto.description,
+      deadline: dto.deadline ? new Date(dto.deadline) : null,
+      projectId: dto.projectId,
+      assigneeId: dto.assigneeId,
+      creatorId: dto.creatorId, 
+    } });
   }
 
   async updateTask(taskId: string, dto: UpdateTaskDto) {
@@ -25,15 +33,20 @@ export class ProjectTaskService {
     });
     if (!member) throw new ForbiddenException('Not part of project');
 
-    // If not manager, only allow deadline change
+    // If not manager, only allow status change
     if (!member.isManager) {
       return this.prisma.projectTask.update({
         where: { id: taskId },
-        data: { deadline: dto.deadline },
+        data: { status: dto.status  },
       });
     }
 
-    return this.prisma.projectTask.update({ where: { id: taskId }, data: dto });
+    return this.prisma.projectTask.update({ where: { id: taskId }, data: {
+      title: dto.title,
+      description: dto.description,
+      deadline: dto.deadline ? new Date(dto.deadline) : null,
+      assigneeId: dto.assigneeId,
+    } });
   }
 
   async deleteTask(taskId: string, userId: string) {

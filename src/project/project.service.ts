@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { AddMemberDto } from './dto/add-member.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
+import { RemoveMemberDto } from './dto/remove-member.dto';
 
 @Injectable()
 export class ProjectService {
@@ -64,4 +65,53 @@ async getProjectsForUser(userId: string) {
   });
 }
 
+async removeMember(dto: RemoveMemberDto) {
+  return this.prisma.projectMember.deleteMany({
+    where: {
+      projectId: dto.projectId,
+      userId: dto.userId,
+    },
+  });
+}
+
+async deleteProject(projectId: string, userId: string) {
+  // Check if the user is a manager of the project
+  const isManager = await this.prisma.projectMember.findFirst({
+    where: {
+      projectId,
+      userId,
+      isManager: true,
+    },
+  });
+
+  if (!isManager) {
+    throw new NotFoundException('Project not found or you do not have permission to delete it');
+  }
+
+  // First delete all related records
+  await this.prisma.projectMember.deleteMany({
+    where: { projectId },
+  });
+
+  // Then delete the project
+  return this.prisma.project.delete({
+    where: { id: projectId },
+  });
+}
+
+async searchUsers(username: string) {
+  return this.prisma.user.findMany({
+    where: {
+      username: {
+        contains: username,
+        mode: 'insensitive',
+      },
+    },
+    select: {
+      id: true,
+      username: true,
+      email: true,
+    },
+  });
+}
 }
